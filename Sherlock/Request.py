@@ -1,17 +1,35 @@
-
+from collections import OrderedDict
+from Sherlock.MOSS.Languages import format_dict
 
 class Request():
+"""
+A request object will store all the details
+provided by the contest_object passed on by
+client(PHP) in an organized manner.
+"""
 
 	def __init__(self, contest_object):
 		self.contest_id = contest_object['contest_id']
 		self.contest_name = contest_object['contest_name']
-		# dict of submissions based on language supported bu moss
+
+		# dict of submissions based on language supported by moss
 		self.submissions = Request.sort_submissions(contest_object['submissons'])
-		self.moss_report_url = None
+
+		# Will be updated to list of URLs after passing the request object to MOSS
+		self.moss_report_urls = None
+
+	def get_contest_id(self):
+		return self.contest_id
+
+	def get_contest_name(self):
+		return self.contest_name
+
+	def get_moss_reports(self):
+		return self.moss_report_urls
 
 	@staticmethod
 	def sort_submissions(submissions):
-	'''
+	"""
 	Returns dictionary of submissions grouped
 	with respect to the language. Each language
 	key will contain list of user submission
@@ -35,10 +53,8 @@ class Request():
 				}
 			]
 	}
-
-	'''
-
-		result = defaultdict(list)
+	"""
+		result = OrderedDict()
 
 		for submission in submissions:
 			# discard submissions not supported by MOSS

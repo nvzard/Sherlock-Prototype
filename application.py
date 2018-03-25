@@ -1,32 +1,43 @@
 from flask import Flask, request
 
-from queue import Queue
-from threading import Thread
+import json 
 from multiprocessing import Process, Queue
 
-import json 
-from Sherlock.main import run
-from Sherlock.request import Request
+from Sherlock import main
+
 
 app = Flask(__name__)
 
-control_queue = Queue()
+requests_queue = Queue()
 processes = []
-
-def worker():
-	sherlock_main(contest_data)
-
-
 
 @app.route('/process/', methods =['POST'])
 def process():
+    """
+	Sample contest_data object:
+	{
+		'contest_id': 'ID of contest',
+		'contest_naem': 'Name of contest',
+		'submissions': [	# List of submissions of the contest
+			{
+			  'user_id': 'id of user',
+			  'username': 'username of user',
+			  'problem_id': 'ID of problem',
+			  'language': 'Language user for submission eg c, py,etc',
+			  'guid': 'guid of run',
+			  'source': 'code for the submission'
+			}		
+		 ]
+	}
+    """
+    # get JSON object from POST request by client
     contest_data = request.get_json()
 
     # put contest_data into queue
-    control_queue.put(data_data)
+    requests_queue.put(contest_data)
 
     if len(processes) < 4:
-    	p = Process(target=sherlock_main.run, args=(control_queue,))
+    	p = Process(target=main.run, args=(requests_queue, processes))
     	processes.append(p)
     	p.start()
 

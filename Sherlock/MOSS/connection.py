@@ -1,4 +1,6 @@
 import socket
+import sys
+
 
 class Moss:
 """
@@ -8,12 +10,13 @@ and customized for OmegaUp.
 
 Github:- https://github.com/soachishti/moss.py
 """
-
     SERVER = 'moss.stanford.edu'
-    PORT = 7690 
+    PORT = 7690
+
 
 	def __init__(self, language, submission_list):
-		self.user_id = CONST
+		# 
+		self.user_id = 'SECRET USER ID, UNIQUE FOR EVERYONE'
        	self.options = {
             "l": "",
             "m": 10,
@@ -25,12 +28,22 @@ Github:- https://github.com/soachishti/moss.py
         self.options['l'] = language
         self.submissions = submission_list
 
+    def uploadFile(self, socket, file_id, filename, content):
+    	size = sys.getsizeof(content)
+    	message = "file {0} {1} {2} {3}\n".format(
+            file_id,
+            self.options['l'],
+            size,
+            filename
+        )
+    	socket.send(message.encode())
+    	socket.send(content)
 
     def run(self, queue):
         s = socket.socket()
-        s.connect((self.server, self.port))
+        s.connect((self.SERVER, self.PORT))
 
-        s.send("moss {}\n".format(self.moss_id).encode())
+        s.send("moss {}\n".format(self.user_id).encode())
         s.send("directory {}\n".format(self.options['d']).encode())
         s.send("X {}\n".format(self.options['x']).encode())
         s.send("maxmatches {}\n".format(self.options['m']).encode())
@@ -42,10 +55,11 @@ Github:- https://github.com/soachishti/moss.py
             s.send(b"end\n")
             s.close()
 
-        for index, submission in iter(submissions):
+        for index, submission in enumerate(self.submissions):
+        	# filename = "problemID_username_guid.language_extension"
         	filename = submission['problem_id'] + "_" +
         			   submission['username'] + "_" +
-        			   submission['guid']
+        			   submission['guid'] + "." + self.language
 
         	self.uploadFile(s, index+1, filename, submission['source'] )
 
@@ -59,15 +73,3 @@ Github:- https://github.com/soachishti/moss.py
 
         result = (self.language, link)
         queue.put(result)
-
-
-    def uploadFile(self, s, file_id, filename, content):
-    	size = len(content)
-    	message = "file {0} {1} {2} {3}\n".format(
-            file_id,
-            self.options['l'],
-            size,
-            filename
-        )
-    	s.send(message.encode())
-    	s.send(content)
