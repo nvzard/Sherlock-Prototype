@@ -3,21 +3,19 @@ import sys
 
 
 class Moss:
-"""
-Inspired by moss.py a Python client for moss by Syed Chishti
+    """
+    Inspired by moss.py a Python client for moss by Syed Chishti
 
-and customized for OmegaUp.
+    and customized for OmegaUp.
 
-Github:- https://github.com/soachishti/moss.py
-"""
+    Github:- https://github.com/soachishti/moss.py
+    """
     SERVER = 'moss.stanford.edu'
     PORT = 7690
 
-
-	def __init__(self, language, submission_list):
-		# 
-		self.user_id = 'SECRET USER ID, UNIQUE FOR EVERYONE'
-       	self.options = {
+    def __init__(self, language, submission_list):
+        self.user_id = 'SECRET USER ID, UNIQUE FOR EVERYONE'
+        self.options = {
             "l": "",
             "m": 10,
             "d": 0,
@@ -29,15 +27,15 @@ Github:- https://github.com/soachishti/moss.py
         self.submissions = submission_list
 
     def uploadFile(self, socket, file_id, filename, content):
-    	size = sys.getsizeof(content)
-    	message = "file {0} {1} {2} {3}\n".format(
+        size = sys.getsizeof(content)
+        message = "file {0} {1} {2} {3}\n".format(
             file_id,
             self.options['l'],
             size,
             filename
         )
-    	socket.send(message.encode())
-    	socket.send(content)
+        socket.send(message.encode())
+        socket.send(content)
 
     def run(self, queue):
         s = socket.socket()
@@ -56,15 +54,15 @@ Github:- https://github.com/soachishti/moss.py
             s.close()
 
         for index, submission in enumerate(self.submissions):
-        	# filename = "problemID_username_guid.language_extension"
-        	filename = submission['problem_id'] + "_" +
-        			   submission['username'] + "_" +
-        			   submission['guid'] + "." + self.language
 
-        	self.uploadFile(s, index+1, filename, submission['source'] )
+            # filename = "problemID_username_guid.language_extension"
+            filename = submission['problem_id'] + "_" + \
+                       submission['username'] + "_" + \
+                       submission['guid'] + "." + self.language
+
+            self.uploadFile(s, index+1, filename, submission['source'] )
 
         s.send("query 0 {}\n".format(self.options['c']).encode())
-
         response = s.recv(1024)
         s.send(b'end\n')
         s.close()
