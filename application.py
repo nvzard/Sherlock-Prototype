@@ -1,7 +1,8 @@
 from flask import Flask, request
 
 import json 
-from multiprocessing import Process, Queue
+from queue import Queue
+import concurrent.futures
 
 from Sherlock import main
 
@@ -9,7 +10,6 @@ from Sherlock import main
 app = Flask(__name__)
 
 requests_queue = Queue()
-processes = []
 
 @app.route('/process/', methods =['POST'])
 def process():
@@ -32,14 +32,10 @@ def process():
     """
     # get JSON object from POST request by client
     contest_data = request.get_json()
+    requests_queue.put(contest_data)
 
-    # put contest_data into queue
-    # requests_queue.put(contest_data)
-
-    if len(processes) < 4:
-        p = Process(target=main.run, args=(requests_queue, processes))
-        processes.append(p)
-        p.start()
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+        executor.submit(main.run, requests_queue)
 
     return '200'
 

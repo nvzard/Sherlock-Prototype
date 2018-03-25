@@ -62,18 +62,10 @@ def run(control_queue, processes):
 	parser = Parser(request)
 	json_report = parser.get_json_report()
 
-
 	# Write the generated JSON report to memory
 	write_json_report(request, json_report)
 
 	# Update 'report_status' in database to 'Created'
 	update_report_status(request.get_contest_id(), 'CREATED')
-
-	# remove the process form the processes list and
-	# terminate the process after its work is done
-	for process in processes:
-		if process.getpid() is sys.getpid():
-			processes.remove(process)
-			sys.exit(0)
 
 
