@@ -2,14 +2,16 @@ from flask import Flask, request
 
 import json 
 from queue import Queue
-import concurrent.futures
+from concurrent.futures import ThreadPoolExecutor
 
 from Sherlock import main
 
 
 app = Flask(__name__)
 
+executor = ThreadPoolExecutor(2)
 requests_queue = Queue()
+
 
 @app.route('/process/', methods =['POST'])
 def process():
@@ -34,8 +36,7 @@ def process():
     contest_data = request.get_json()
     requests_queue.put(contest_data)
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
-        executor.submit(main.run, requests_queue)
+    executor.submit(main.run, requests_queue)
 
     return '200'
 
