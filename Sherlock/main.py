@@ -32,13 +32,13 @@ def run_moss(request):
 def write_json_report(request, json_report):
 	"""
 	This method will write the JSON report to memory.
-	at location similar to 
+	at location similar to
 	/var/lib/omegaup/plagiarism/{contest_id % 100}/{contest_id}
 	"""
 	# TODO
 	pass
 
-def run(control_queue, processes):
+def run(control_queue):
 
 	# get data from contest queue to process
 	contest_data = control_queue.get()
