@@ -3,7 +3,7 @@ import sys
 from Sherlock.Database_helper import update_request_status
 from Sherlock.Request import Request
 from Sherlock.MOSS.connection import Moss
-from multiprocessing import Process, Queue
+from queue import Queue
 
 
 def run_moss(request):
@@ -25,14 +25,7 @@ def run_moss(request):
 	queue = Queue()
 	for language, submission_list  in request.submissions.iteritems():
 		moss = Moss(language, submission_list)
-
-		process = Process(target=moss.run, args=(queue,))
-		processes.append(process)
-		process.start()
-
-	for process in processes:
-		reports.append(queue.get())
-		process.join()
+		moss.run(queue)
 
 	return reports
 
